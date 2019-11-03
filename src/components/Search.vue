@@ -1,6 +1,7 @@
 <template>
   <div class="search">
     <input v-model="searchParams" @keyup.enter="search" />
+    <span v-if="error">{{ error }}</span>
   </div>
 </template>
 
@@ -11,7 +12,8 @@ export default {
   name: "search",
   data() {
     return {
-      searchParams: ""
+      searchParams: "",
+      error: ""
     };
   },
   methods: {
@@ -19,7 +21,11 @@ export default {
       let response = await axios.get(`${BASE_URL}&s=${this.searchParams}`);
       if (response.status === 200) {
         let data = response.data;
-        if (data.Response === "True") return this.$emit("search", data.Search);
+        if (data.Response === "True") {
+          this.error = "";
+          return this.$emit("search", data.Search);
+        }
+        this.error = data.Error;
       }
     }
   }
